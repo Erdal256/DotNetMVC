@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetMvc", "DotNetMvc\DotNetMvc.csproj", "{66EDAB32-08BF-4365-803B-C731B989439F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlCssJavascript", "HtmlCssJavascript\HtmlCssJavascript.csproj", "{DC127DCF-29EA-4C95-AA10-B2C435CAFBAB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66EDAB32-08BF-4365-803B-C731B989439F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66EDAB32-08BF-4365-803B-C731B989439F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66EDAB32-08BF-4365-803B-C731B989439F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66EDAB32-08BF-4365-803B-C731B989439F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC127DCF-29EA-4C95-AA10-B2C435CAFBAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC127DCF-29EA-4C95-AA10-B2C435CAFBAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC127DCF-29EA-4C95-AA10-B2C435CAFBAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC127DCF-29EA-4C95-AA10-B2C435CAFBAB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F078A4CA-3A18-44D0-8855-FDA9C0351620}
+	EndGlobalSection
+EndGlobal
