@@ -10,7 +10,7 @@ namespace DotNetMvc.Contexts
             
         }
 
-        public DbSet<Movie> Movies { get; set; }
+        public DbSet<Movie> Movies { get; set; } 
         public DbSet<Director> Directors { get; set; }
         public DbSet<MovieDirector> MovieDirectors { get; set; }
         public DbSet<Review> Reviews { get; set; }
