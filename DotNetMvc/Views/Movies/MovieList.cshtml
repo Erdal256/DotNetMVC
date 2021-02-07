@@ -1,0 +1,46 @@
+﻿@model List<MovieModel>
+@{
+    ViewBag.Title = "Movie List";
+}>
+<div class="paddingtop">
+    <h2>@ViewBag.Title</h2>
+    <table class="table">
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Production year
+            </th>
+            <th>
+                Box Office Return
+            </th>
+            <th>
+                Directors
+            </th>
+        </tr>
+        @foreach (MovieModel movie in Model)
+        {
+            <tr>
+                <th>
+                    @movie.Name
+                </th>
+                <th>
+                    @movie.Production year
+                </th>
+                <th>
+                    @movie.Box Office Return
+                </th>
+                <th>
+                    @foreach(DirectorModel director in movie.Directors)
+                    {
+                        @(director.Name + " " + director.Surname)
+                        <br />
+                    }
+                </th>
+            </tr>
+        }
+    </table>
+
+</div>
+
