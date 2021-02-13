@@ -69,5 +69,23 @@ namespace _036_MoviesMvcBilgeAdam.Services
                 throw exc;
             }
         }
+
+        public void Update(MovieModel model)
+        {
+            try
+            {
+                Movie entity = _db.Movies.Find(model.Id);
+                entity.Name = model.Name;
+                entity.BoxOfficeReturn = model.BoxOfficeReturn;
+                entity.ProductionYear = model.ProductionYear;
+                _db.Entry(entity).State = System.Data.Entity.EntityState.Modified;
+                _db.SaveChanges();
+            }
+            catch (Exception exc)
+            {
+
+                throw exc;
+            }
+        }
     }
 }
