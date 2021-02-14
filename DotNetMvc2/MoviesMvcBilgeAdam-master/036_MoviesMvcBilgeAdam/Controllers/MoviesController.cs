@@ -14,11 +14,13 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
     {
         private readonly MoviesContext _db;
         private readonly MovieService _movieService;
+        private readonly DirectorService _directorService;
 
         public MoviesController()
         {
             _db = new MoviesContext();
             _movieService = new MovieService(_db);
+            _directorService = new DirectorService(_db);
         }
 
         // GET: Movies
@@ -38,7 +40,30 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
             }
             catch (Exception exc)
             {
-                return View("_Exception");
+                return View("Exception");
+            }
+        }
+
+        // GET: Movies/ListAfterDelete?result=1
+        public ActionResult ListAfterDelete(int? result = null)
+        {
+            try
+            {
+                if (result.HasValue)
+                {
+                    if (result.Value == 1)
+                        TempData["Message"] = "Movie deleted successfully.";
+                    else if (result.Value == 0)
+                        TempData["Message"] = "Movie could not be deleted because there are relational reviews.";
+                    else // -1
+                        TempData["Message"] = "An error occured while deleting the movie!";
+                }
+                List<MovieModel> model = _movieService.GetQuery().ToList();
+                return View("MovieList", model);
+            }
+            catch (Exception exc)
+            {
+                return View("Exception");
             }
         }
 
@@ -76,6 +101,7 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         {
             return new EmptyResult();
         }
+
         // GET: Movies/Create
         //public ActionResult Create()
         [HttpGet] // bu action method selector yazılmadığında default'u HttpGet'tir
@@ -88,6 +114,9 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
             }
             ViewBag.Years = years;
 
+            List<DirectorModel> directors = _directorService.GetQuery().ToList();
+            ViewBag.Directors = directors;
+
             //return new ViewResult();
             return View();
         }
@@ -97,8 +126,9 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         //{
         //    return Content("Movie submitted: Name = " + Name + ", BoxOfficeReturn = " + BoxOfficeReturn + ", ProductionYear = " + ProductionYear);
         //}
+        // POST: Movies/Create
         [HttpPost]
-        public ActionResult Create(string Name, double? BoxOfficeReturn, string ProductionYear)
+        public ActionResult Create(string Name, double? BoxOfficeReturn, string ProductionYear, List<int> DirectorIds)
         {
             try
             {
@@ -110,7 +140,8 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
                 {
                     Name = Name,
                     BoxOfficeReturn = BoxOfficeReturn,
-                    ProductionYear = ProductionYear
+                    ProductionYear = ProductionYear,
+                    DirectorIds = DirectorIds
                 };
                 _movieService.Add(model);
 
@@ -119,37 +150,39 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
             }
             catch (Exception exc)
             {
-                return View("_Exception");
+                return View("Exception");
             }
         }
+
+        // GET: Movies/Details/7
         public ActionResult Details(int? id)
         {
             try
             {
-                // if(id == nul)
+                //if (id == null)
                 if (!id.HasValue)
                 {
-                    //return View("_Exception");
-                    /* return new HttpStatusCodeResult(HttpStatusCode.BadRequest);*/ //400
+                    //return View("Exception");
+                    //return new HttpStatusCodeResult(HttpStatusCode.BadRequest); // 400
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Id is required!");
                 }
-                MovieModel model = _movieService.GetQuery().SingleOrDefault(m => m.Id == id);
+                MovieModel model = _movieService.GetQuery().SingleOrDefault(m => m.Id == id.Value);
                 if (model == null)
                 {
-                    //return View("_Exception");
-                    /*return new HttpStatusCodeResult(HttpStatusCode.NotFound); *///404
+                    //return View("Exception");
+                    //return new HttpStatusCodeResult(HttpStatusCode.NotFound); // 404
                     //return new HttpStatusCodeResult(HttpStatusCode.NotFound, "Movie not found!");
-
+                    return HttpNotFound();
                 }
                 return View(model);
             }
             catch (Exception exc)
             {
-
-                return View("_Exception");
+                return View("Exception");
             }
-
         }
+
+        // GET: Movies/Edit/7
         public ActionResult Edit(int? id)
         {
             try
@@ -159,31 +192,36 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
                 MovieModel model = _movieService.GetQuery().SingleOrDefault(m => m.Id == id);
                 if (model == null)
                     return HttpNotFound();
+
                 List<int> years = new List<int>();
                 for (int year = DateTime.Today.Year + 1; year >= 1930; year--)
                 {
                     years.Add(year);
                 }
-                List<SelectListItem> yearsSelectItems = years.Select(y => new SelectListItem()
+                List<SelectListItem> yearSelectListItems = years.Select(y => new SelectListItem()
                 {
                     Value = y.ToString(),
                     Text = y.ToString()
                 }).ToList();
-                SelectList yearSelectList = new SelectList(yearsSelectItems, "Value", "Text", model.ProductionYear);
+                SelectList yearSelectList = new SelectList(yearSelectListItems, "Value", "Text", model.ProductionYear); // DropDownList
 
                 //ViewBag.Years = yearSelectList;
-                ViewData["Years"] = yearSelectList; //iki örnek aynı.
+                ViewData["Years"] = yearSelectList;
+
+                List<DirectorModel> directors = _directorService.GetQuery().ToList();
+                MultiSelectList directorMultiSelectList = new MultiSelectList(directors, "Id", "FullName", model.DirectorIds); // ListBox
+
+                ViewData["Directors"] = directorMultiSelectList;
 
                 return View(model);
             }
-            catch (Exception exc )
+            catch (Exception exc)
             {
-
-                return View("_Exception");
-
+                return View("Exception");
             }
-          
         }
+
+        // POST: Movies/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         //public ActionResult Edit(string Name, double? BoxOfficeReturn, string ProductionYear)
@@ -191,32 +229,102 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         {
             try
             {
-                if(ModelState.IsValid)
+                if (ModelState.IsValid)
                 {
                     _movieService.Update(model);
                     return RedirectToAction("List");
                 }
+
                 List<int> years = new List<int>();
-                for (int year = DateTime.Today.Year + 1; year >= 1930; year--)
+                for (int year = DateTime.Now.Date.Year + 1; year >= 1930; year--)
                 {
                     years.Add(year);
                 }
-                List<SelectListItem> yearsSelectItems = years.Select(y => new SelectListItem()
+                List<SelectListItem> yearSelectListItems = years.Select(y => new SelectListItem()
                 {
                     Value = y.ToString(),
                     Text = y.ToString()
                 }).ToList();
-                SelectList yearSelectList = new SelectList(yearsSelectItems, "Value", "Text", model.ProductionYear);
+                SelectList yearSelectList = new SelectList(yearSelectListItems, "Value", "Text", model.ProductionYear);
                 ViewBag.Years = yearSelectList;
 
                 return View(model);
             }
-            catch (Exception exc )
+            catch (Exception exc)
             {
-
-                return View("_Exception");
+                return View("Exception");
             }
-            
+        }
+
+        // GET: Movies/DeleteMovie/7
+        //public ActionResult DeleteMovie(int? id)
+        //{
+        //    try
+        //    {
+        //        if (id == null)
+        //            return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //        bool result = _movieService.Delete(id.Value);
+        //        if (result)
+        //            TempData["Message"] = "Movie deleted successfully.";
+        //        else
+        //            TempData["Message"] = "Movie could not be deleted because there are relational reviews.";
+        //        return RedirectToAction("List");
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        TempData["Message"] = "An error occured while deleting the movie!";
+        //        return RedirectToAction("List");
+        //    }
+        //}
+
+        // GET: Movies/Delete/7
+        public ActionResult Delete(int? id)
+        {
+            try
+            {
+                if (id == null)
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                MovieModel model = _movieService.GetQuery().SingleOrDefault(m => m.Id == id);
+                if (model == null)
+                    return HttpNotFound();
+
+                // Bu tip model özelleştirme işlemleri ya servislerde ya da modellerde yapılmalıdır!
+                //if (model.Directors != null && model.Directors.Count > 0)
+                //{
+                //    model.DirectorNamesHtml = "";
+                //    foreach (DirectorModel directorModel in model.Directors)
+                //    {
+                //        model.DirectorNamesHtml += directorModel.Name + " " + directorModel.Surname + "<br />";
+                //    }
+                //}
+
+                return View(model);
+            }
+            catch (Exception exc)
+            {
+                return View("Exception");
+            }
+        }
+
+        // POST: Movies/Delete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int? id)
+        {
+            try
+            {
+                if (id == null)
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                bool result = _movieService.Delete(id.Value);
+                if (result)
+                    return RedirectToAction("ListAfterDelete", new { result = 1 }); // ~/Movies/List?result=1 : query string
+                return RedirectToAction("ListAfterDelete", new { result = 0 }); // ~/Movies/List?result=0
+            }
+            catch (Exception exc)
+            {
+                return RedirectToAction("ListAfterDelete", new { result = -1 }); // ~/Movies/List?result=-1
+            }
         }
     }
 }

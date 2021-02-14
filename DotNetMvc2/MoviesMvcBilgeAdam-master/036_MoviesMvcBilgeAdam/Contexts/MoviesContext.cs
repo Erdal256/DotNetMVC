@@ -7,7 +7,7 @@ namespace _036_MoviesMvcBilgeAdam.Contexts
     {
         public MoviesContext() : base("MoviesContext") // web.config'teki connection string name parametre olarak gönderilir
         {
-            
+
         }
 
         public DbSet<Movie> Movies { get; set; }
@@ -24,5 +24,25 @@ namespace _036_MoviesMvcBilgeAdam.Contexts
         2) Web uygulamamızı çalıştırıp Register link'i üzerinden yeni bir kullanıcı oluşturuyoruz. Girilen kullanıcı ve ilgili kullanıcı tabloları Entity Framework'ün yeteneğinden dolayı otomatik oluşacaktır.
         */
         // Örnek olarak olşturduğum kullanıcı adı: cagil@alsac.com, şifre: Cagil123!
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            // Fluent API = Akıcı API
+            modelBuilder.Entity<Review>()
+                 .HasRequired(review => review.Movie) //reguired(HesRequired8()) : mutlaka olmalı, optional(HesOptional()): olmasa da olur
+                 .WithMany(movie => movie.Reviews)
+                 .HasForeignKey(revies => revies.MovieId)
+                 .WillCascadeOnDelete(false); // veritabanındaki Review ile Movie arasındaki ilişkide delete rule no action olur
+            modelBuilder.Entity<MovieDirector>()
+                .HasRequired(movieDirector => movieDirector.Movie)
+                .WithMany(movive => movive.MovieDirectors)
+                .HasForeignKey(movieDirector => movieDirector.MovieId)
+                .WillCascadeOnDelete(false);
+            modelBuilder.Entity<MovieDirector>()
+              .HasRequired(movieDirector => movieDirector.Director)
+              .WithMany(director => director.MovieDirectors)
+              .HasForeignKey(movieDirector => movieDirector.DirectorId)
+              .WillCascadeOnDelete(false);
+        }
     }
 }
