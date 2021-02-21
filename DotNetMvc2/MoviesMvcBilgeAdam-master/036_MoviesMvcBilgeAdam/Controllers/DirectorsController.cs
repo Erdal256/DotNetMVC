@@ -9,6 +9,7 @@ using _036_MoviesMvcBilgeAdam.Models;
 
 namespace _036_MoviesMvcBilgeAdam.Controllers
 {
+    [HandleError]
     public class DirectorsController : Controller
     {
         private MoviesContext db = new MoviesContext();
@@ -23,6 +24,7 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         }
 
         // GET: Directors
+        [HandleError] //Controller üzerinde tanımladığımız için her aksiyon da tanımlamaya gerek yoktur.
         public ActionResult Index()
         {
             //return View(db.Directors.ToList());
@@ -104,6 +106,7 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+            [HandleError]
         //public ActionResult Edit([Bind(Include = "Id,Name,Surname,Retired")] Director director)
         public ActionResult Edit(DirectorModel director)
         {
@@ -122,6 +125,7 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         }
 
         // GET: Directors/Delete/5
+       
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -142,6 +146,7 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         // POST: Directors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        
         public ActionResult DeleteConfirmed(int id)
         {
             //Director director = db.Directors.Find(id);
