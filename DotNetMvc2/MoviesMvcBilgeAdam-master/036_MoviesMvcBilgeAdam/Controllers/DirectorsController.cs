@@ -1,15 +1,15 @@
 ﻿using _036_MoviesMvcBilgeAdam.Contexts;
-using _036_MoviesMvcBilgeAdam.Entities;
+using _036_MoviesMvcBilgeAdam.Models;
 using _036_MoviesMvcBilgeAdam.Services;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
-using _036_MoviesMvcBilgeAdam.Models;
 
 namespace _036_MoviesMvcBilgeAdam.Controllers
 {
     [HandleError]
+    //[Authorize(Roles = "Admin,User")]
+    [Authorize]
     public class DirectorsController : Controller
     {
         private MoviesContext db = new MoviesContext();
@@ -24,7 +24,8 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         }
 
         // GET: Directors
-        [HandleError] //Controller üzerinde tanımladığımız için her aksiyon da tanımlamaya gerek yoktur.
+        //[HandleError] // Controller üzerinde tanımladığımız için her aksiyonda tanımlamamıza gerek yoktur.
+        [AllowAnonymous]
         public ActionResult Index()
         {
             //return View(db.Directors.ToList());
@@ -32,6 +33,8 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         }
 
         // GET: Directors/Details/5
+        //[HandleError]
+        [AllowAnonymous]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -50,6 +53,8 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         }
 
         // GET: Directors/Create
+        //[HandleError]
+        [Authorize(Roles = "Admin")]
         public ActionResult Create()
         {
             ViewBag.Movies = new MultiSelectList(movieService.GetQuery().ToList(), "Id", "Name");
@@ -63,6 +68,8 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        //[HandleError]
         //public ActionResult Create([Bind(Include = "Id,Name,Surname,Retired")] Director director)
         //public ActionResult Create([Bind(Include = "Name,Surname,Retired,MovieIds")] DirectorModel director)
         //public ActionResult Create([Bind(Exclude = "Id")] DirectorModel director)
@@ -81,6 +88,8 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         }
 
         // GET: Directors/Edit/5
+        //[HandleError]
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -106,7 +115,8 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-            [HandleError]
+        [Authorize(Roles = "Admin")]
+        //[HandleError]
         //public ActionResult Edit([Bind(Include = "Id,Name,Surname,Retired")] Director director)
         public ActionResult Edit(DirectorModel director)
         {
@@ -125,7 +135,7 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         }
 
         // GET: Directors/Delete/5
-       
+        //[HandleError]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -146,7 +156,8 @@ namespace _036_MoviesMvcBilgeAdam.Controllers
         // POST: Directors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        
+        //[HandleError] // Devreye almak için web.config'te system.web altına eğer yoksa <customErrors mode="On"></customErrors> eklenmelidir.
+        // Hata olması durumunda default olarak bu controller'a ait veya Shared klasöründeki Error.cshtml view'ını return eder.
         public ActionResult DeleteConfirmed(int id)
         {
             //Director director = db.Directors.Find(id);

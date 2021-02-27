@@ -24,20 +24,21 @@ namespace _036_MoviesMvcBilgeAdam
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
-                      "~/Content/site.css",
-                      "~/Content/font-awesome.css"));
-            bundles.Add(new StyleBundle("~/Content/datepickercss").Include(
-                "~/Plugins/bootstrap-datepicker/dist/css//bootstrap-datgepicker.min.css"
+                      "~/Content/site.css"
+                      //,"~/Content/font-awesome.css"
+                      ));
+
+            bundles.Add(new StyleBundle("~/Content/fontawesome").Include(
+                "~/Content/font-awesome.css"
                 ));
 
-            bundles.Add(new ScriptBundle("~/plugins/datepickerscss").Include(
-                    "~/Scripts/bootstrap.js"));
-
-            bundles.Add(new ScriptBundle("~/plugins/datepickerscss").Include(
-                "~/Plugins/bootstrap-datepicker/dist/js//bootstrap-datgepicker.min.js",
-                  "~/Plugins/bootstrap-datepicker/dist/locales//bootstrap-datgepicker.tr.min.js"
+            bundles.Add(new StyleBundle("~/plugins/datepickercss").Include(
+                "~/Plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css"
                 ));
-                   
+            bundles.Add(new ScriptBundle("~/plugins/datepickerjs").Include(
+                "~/Plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js",
+                "~/Plugins/bootstrap-datepicker/dist/locales/bootstrap-datepicker.tr.min.js"
+                ));
         }
     }
 }

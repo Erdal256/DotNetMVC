@@ -1,24 +1,27 @@
-﻿using _036_MoviesMvcBilgeAdam.Contexts;
-using _036_MoviesMvcBilgeAdam.Models;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Runtime.CompilerServices;
+using _036_MoviesMvcBilgeAdam.Contexts;
+using _036_MoviesMvcBilgeAdam.Entities;
+using _036_MoviesMvcBilgeAdam.Models;
 
 namespace _036_MoviesMvcBilgeAdam.Services
 {
-    //AutoMaper: Bir class tipindeki (Review) bir objeyi baika bir class tipine 
-    //(ReviewModel) hiç özelliklerini assing etmeden(Id = r.Id, Content = r.Content, Date = r.Date...) 7
-    //tek bir configurasyon yaparak obje dönüştürme işlemi yapan kütüphane.  http://automapper.org/
-
     public class ReviewService
     {
+        // AutoMapper: Bir class tipindeki (Review) bir objeyi başka bir class tipine (ReviewModel),
+        // hiç özellikleri assign etmeden (Id = r.Id, Content = r.Content, Date = r.Date...)
+        // tek bir konfigürasyon yaparak obje dönüştürme işlemlerini yapan kütüphane. https://automapper.org/
+
         private readonly MoviesContext _db;
 
         public ReviewService(MoviesContext db)
         {
             _db = db;
         }
+
         public IQueryable<ReviewModel> GetQuery()
         {
             try
@@ -49,16 +52,70 @@ namespace _036_MoviesMvcBilgeAdam.Services
             }
             catch (Exception exc)
             {
+                throw exc;
+            }
+        }
+
+        public void FillAllRatings(ReviewModel review)
+        {
+            review.AllRatings = new List<int>();
+            for (int i = 1; i <= 10; i++)
+            {
+                review.AllRatings.Add(i);
+            }
+        }
+
+        public void Add(ReviewModel model)
+        {
+            try
+            {
+                Review entity = new Review()
+                {
+                    Content = model.Content,
+                    Date = model.Date.Value,
+                    MovieId = model.MovieId,
+                    Rating = model.Rating,
+                    Reviewer = string.IsNullOrWhiteSpace(model.Reviewer) ? "Anonymous" : model.Reviewer
+                };
+                _db.Reviews.Add(entity);
+                _db.SaveChanges();
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+        public void Update(ReviewModel model)
+        {
+            try
+            {
+                Review entity = _db.Reviews.Find(model.Id);
+                entity.Content = model.Content;
+                entity.Date = model.Date.Value;
+                entity.MovieId = model.MovieId;
+                entity.Rating = model.Rating;
+                entity.Reviewer = string.IsNullOrWhiteSpace(model.Reviewer) ? "Anonymous" : model.Reviewer;
+                _db.Entry(entity).State = System.Data.Entity.EntityState.Modified;
+                _db.SaveChanges();
+            }
+            catch (Exception exc)
+            {
 
                 throw exc;
             }
         }
-        public void FillAllRating(ReviewModel review)
+        public void Delete (int id)
         {
-            review.AllRating = new List<int>();
-            for (int i = 1; i < 10; i++)
+            try
             {
-                review.AllRating.Add(i);
+                Review entity = _db.Reviews.Find(id);
+                _db.Reviews.Remove(entity);
+                _db.SaveChanges();
+            }
+            catch (Exception exc)
+            {
+
+                throw exc;
             }
         }
     }
